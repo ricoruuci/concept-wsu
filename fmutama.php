@@ -64,7 +64,7 @@ $namahalaman = "Dashboard";
 
                             $query = sqlsrv_query($conn,"
                             SELECT 
-                            ISNULL(SUM(CASE WHEN X.Overdue < 0 THEN X.Sisa ELSE 0 END),0) as BlmJth,
+                            ISNULL(SUM(CASE WHEN X.Overdue <= 0 THEN X.Sisa ELSE 0 END),0) as BlmJth,
                             ISNULL(SUM(CASE WHEN X.Overdue BETWEEN 1 AND 30 THEN X.Sisa ELSE 0 END),0) as '1sd30',
                             ISNULL(SUM(CASE WHEN X.Overdue BETWEEN 31 AND 90 THEN X.Sisa ELSE 0 END),0) as '31sd90',
                             ISNULL(SUM(CASE WHEN X.Overdue > 90 THEN X.Sisa ELSE 0 END),0) as 'over90',
