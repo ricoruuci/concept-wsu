@@ -286,7 +286,7 @@ $namahalaman = "Dashboard";
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Nama Group</th>
-                                                    <td scope="col" align='right'><b>Stock</b></td>
+                                                    <td scope="col" align='right'><b>Stock Dalam Kg</b></td>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -315,13 +315,13 @@ $namahalaman = "Dashboard";
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="card">
-                                    <h5 class="card-header">Stock Gudang</h5>
+                                    <h5 class="card-header">Stock Gudang Finish Good</h5>
                                     <div class="card-body">
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Nama Gudang</th>
-                                                    <td scope="col" align='right'><b>Stock</b></td>
+                                                    <td scope="col" align='right'><b>Stock Dalam Meter</b></td>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -329,10 +329,10 @@ $namahalaman = "Dashboard";
                                             
                                             $query8 = sqlsrv_query($conn,"
                                             select x.warehousename, sum(k.stock*k.panjang) as total_meter from (
-                                            select a.itemid, a.warehouseid, b.panjang, isnull(sum(case when a.fgtrans<50 then a.qty else a.qty*-1 end),0) as stock from allitem a 
-                                            inner join inmsitem b on a.itemid=b.itemid group by a.warehouseid, a.itemid, b.panjang
-                                            ) as k inner join inmswarehouse x on k.warehouseid=x.warehouseid where x.fgraw='t'
-                                            group by x.warehousename");
+                                                select a.itemid, a.warehouseid, b.panjang, isnull(sum(case when a.fgtrans<50 then a.qty else a.qty*-1 end),0) as stock from allitem a 
+                                                inner join inmsitem b on a.itemid=b.itemid where b.fgactive='y' group by a.warehouseid, a.itemid, b.panjang
+                                                ) as k inner join inmswarehouse x on k.warehouseid=x.warehouseid where x.fgraw='t'
+                                                group by x.warehousename");
 
                                             while($hasil8 = sqlsrv_fetch_array($query8)){
                                                 echo "<tr>";
@@ -466,7 +466,7 @@ $namahalaman = "Dashboard";
             $blnlalu = date('Ym', strtotime('-1 month'));
             $blnlusa = date('Ym', strtotime('-2 month')); 
 
-            $query4 = sqlsrv_query($conn,"
+            /*$query4 = sqlsrv_query($conn,"
             select * from (
             select A.salesid,A.SalesName,
             (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$blnini."01' and '".$blnini."31' and X.salesid=A.salesid ) as data1,
@@ -474,6 +474,21 @@ $namahalaman = "Dashboard";
             (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$blnlusa."01' and '".$blnlusa."31' and X.salesid=A.salesid ) as data3	
             from armssales A
             ) as K where K.data1+K.data2+K.data3<>0 order by K.SalesName
+            ");*/
+
+            $query4 = sqlsrv_query($conn,"
+            select K.GroupID,L.GroupDesc,SUM(data1) as data1,SUM(data2) as Data2,SUM(data3) as data3 from (
+            select 'A' as GroupID,A.salesid,A.SalesName,
+            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$blnini."01' and '".$blnini."31' and X.salesid=A.salesid ) as data1,
+            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$blnlalu."01' and '".$blnlalu."31' and X.salesid=A.salesid ) as data2,
+            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$blnlusa."01' and '".$blnlusa."31' and X.salesid=A.salesid ) as data3	
+            from armssales A where fgactive='1'
+            ) as K 
+            --left join armsgroupsales L on K.groupID=L.GroupID
+            left join (select 'A' as GroupID,'TEST' as GroupDesc) L on K.groupID=L.GroupID
+            where K.data1+K.data2+K.data3<>0 
+            GROUP BY K.GroupID,L.GroupDesc
+            order by L.GroupDesc
             ");
 
             $abd = 1;
