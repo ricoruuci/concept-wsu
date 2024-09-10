@@ -9,28 +9,28 @@
 	  		case "tampil":
 	  		?>
 
-						<table class="table table-striped table-bordered first">
-						<thead>
-	                        <tr>
-	                            <th>Tanggal</th>
-								<th>Nomor SO</th>
-								<th>Pelanggan</th>
-								<th>Biaya Tambahan</th>
-								<th>Total SO</th>
-								<th>Sales</th>
-								<th>Area</th>
-								<th>PO Customer</th>
-								<th>Status</th>
-								<th>Limit</th>
-								<th>Sisa Piutang</th>
-								<th>Sisa Limit</th>
-								<th>Action</th>
-                                    
-	                    </thead>
-	                        </tr>		
-	                    <tbody>
+<table class="table table-striped table-bordered first">
+    <thead>
+        <tr>
+            <th>Tanggal</th>
+            <th>Nomor SO</th>
+            <th>Pelanggan</th>
+            <th>Biaya Tambahan</th>
+            <th>Total SO</th>
+            <th>Sales</th>
+            <th>Area</th>
+            <th>PO Customer</th>
+            <th>Status</th>
+            <th>Limit</th>
+            <th>Sisa Piutang</th>
+            <th>Sisa Limit</th>
+            <th>Action</th>
 
-						<?php
+    </thead>
+    </tr>
+    <tbody>
+
+        <?php
 						
 						$query = sqlsrv_query($conn,"SELECT CONVERT(VARCHAR(10),K.Transdate,121) as Tanggal,K.POID,K.CustName,K.Adm,K.TTLSO,
 						K.SalesName,K.POCust,K.StatusOto,K.LimitPiutang,K.SisaP,K.LimitPiutang-K.SisaP as SisaL,ISNULL(K.AreaName,'-') as AreaName FROM ( 
@@ -72,45 +72,45 @@
 
 						
 						?>
-						
-							<td>
-								<button type="button" class="btn btn-brand editdata" 
-								data-dataid="<?php echo $hasil['1']; ?>" data-toggle="modal" data-target="#updateModalCenter"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn btn-danger deletedata" 
-                                data-dataid="<?php echo $hasil['1']; ?>" data-toggle="modal" data-target="#deleteModalCenter"><i class="fa fa-tasks"></i></button>
-							</td>
-						</tr>
 
-						<?php	
+        <td>
+            <button type="button" class="btn btn-brand editdata" data-dataid="<?php echo $hasil['1']; ?>"
+                data-toggle="modal" data-target="#updateModalCenter"><i class="fas fa-edit"></i></button>
+            <button type="button" class="btn btn-danger deletedata" data-dataid="<?php echo $hasil['1']; ?>"
+                data-toggle="modal" data-target="#deleteModalCenter"><i class="fa fa-tasks"></i></button>
+        </td>
+        </tr>
+
+        <?php	
 						
 						}	
 
 						?>
 
 
-						</tbody>
-						<tfoot>
-	                        <tr>
-								<th>Tanggal</th>
-								<th>Nomor SO</th>
-								<th>Pelanggan</th>
-								<th>Biaya Tambahan</th>
-								<th>Total SO</th>
-								<th>Sales</th>
-								<th>Area</th>
-								<th>PO Customer</th>
-								<th>Status</th>
-								<th>Limit</th>
-								<th>Sisa Piutang</th>
-								<th>Sisa Limit</th>
-								<th>Action</th>
-	                        </tr>
-	                    </tfoot>
-					</table>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Tanggal</th>
+            <th>Nomor SO</th>
+            <th>Pelanggan</th>
+            <th>Biaya Tambahan</th>
+            <th>Total SO</th>
+            <th>Sales</th>
+            <th>Area</th>
+            <th>PO Customer</th>
+            <th>Status</th>
+            <th>Limit</th>
+            <th>Sisa Piutang</th>
+            <th>Sisa Limit</th>
+            <th>Action</th>
+        </tr>
+    </tfoot>
+</table>
 
 
 
-			<?php
+<?php
 		    echo '<script src="jsku.js"></script>';
 		    echo '<script src="assets/vendor/datatables/js/dataTables.bootstrap4.min.js"></script>';    
 		    echo '<script src="assets/vendor/datatables/js/data-table.js"></script>';
@@ -118,20 +118,20 @@
 					
 			case "getdata":
 			?>
-				<table class="table table-striped table-bordered first">
-				<thead>
-					<tr>
-						<th>Nama Barang</th>
-						<th>Jumlah</th>
-						<th>Satuan</th>
-						<th>Harga</th>
-						<th>Total</th>
-					</tr>		  
-				</thead>
-						
-				<tbody>
+<table class="table table-striped table-bordered first">
+    <thead>
+        <tr>
+            <th>Nama Barang</th>
+            <th>Jumlah</th>
+            <th>Satuan</th>
+            <th>Harga</th>
+            <th>Total</th>
+        </tr>
+    </thead>
 
-					<?php
+    <tbody>
+
+        <?php
 					$ItemID = $_GET['checkid'];
 					$query = sqlsrv_query($conn,"select B.ItemName,A.Jumlah,A.UOMID,A.Price,ISNULL(A.jumlah*A.Price,0) as Total 
 					from ARTrPurchaseOrderDt A inner join INMsItem B on A.ItemID=B.ItemID where A.POID='".$ItemID."' ");
@@ -146,24 +146,79 @@
 					}	
 					?>
 
-				</tbody>
-				<tfoot>
-					<tr>
-						<th>Nama Barang</th>
-						<th>Jumlah</th>
-						<th>Satuan</th>
-						<th>Harga</th>
-						<th>Total</th>
-					</tr>
-				</tfoot>
-				</table>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Nama Barang</th>
+            <th>Jumlah</th>
+            <th>Satuan</th>
+            <th>Harga</th>
+            <th>Total</th>
+        </tr>
+    </tfoot>
+</table>
 
-			<?php
+<?php
 			echo '<script src="jsku.js"></script>';
 			echo '<script src="assets/vendor/datatables/js/dataTables.bootstrap4.min.js"></script>';    
 			echo '<script src="assets/vendor/datatables/js/data-table.js"></script>';
 			break;
+				
+			case "getdataa":
+				?>
+<table class="table table-striped table-bordered first">
+    <thead>
+        <tr>
+            <th>Nama Barang</th>
+            <th>Packaging</th>
+            <th>Jumlah</th>
+            <th>Satuan</th>
+            <th>Harga</th>
+            <th>Total</th>
+        </tr>
+    </thead>
 
+    <tbody>
+
+        <?php
+						$ItemID = $_GET['checkid'];
+						$querys = sqlsrv_query($conn,
+						"SELECT b.itemname,c.ItemName,a.jumlah,a.price,a.uomid,isnull(a.jumlah*a.price,0) as total 
+						from ARTrPurchaseOrderSub a 
+						inner join inmsitem b on a.itemid=b.itemid
+						inner join inmsitem c on a.PackageID=c.itemid
+						where a.poid='".$ItemID."' order by a.itemid,a.PackageID ");
+						while($hasils = sqlsrv_fetch_array($querys)){
+						echo "<tr>";
+						echo "<td>".$hasils[0]."</td>";
+						echo "<td>".$hasils[1]."</td>";
+						echo "<td align='right'>".number_format($hasils[2],2,",",".")."</td>";
+						echo "<td>".$hasils[4]."</td>";
+						echo "<td align='right'>".number_format($hasils[3],2,",",".")."</td>";
+						echo "<td align='right'>".number_format($hasils[5],2,",",".")."</td>";
+						echo "</tr>";	
+						}	
+						?>
+
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Nama Barang</th>
+            <th>Packaging</th>
+            <th>Jumlah</th>
+            <th>Satuan</th>
+            <th>Harga</th>
+            <th>Total</th>
+        </tr>
+    </tfoot>
+</table>
+
+<?php
+				echo '<script src="jsku.js"></script>';
+				echo '<script src="assets/vendor/datatables/js/dataTables.bootstrap4.min.js"></script>';    
+				echo '<script src="assets/vendor/datatables/js/data-table.js"></script>';
+				break;
+				
 			case "tolak" :
 
 				$query = sqlsrv_query($conn,"update ARTrPurchaseOrderHD set FGOto='X',otodate=getdate(),otoby='".$_SESSION['username']."' where POID='".$_POST['delete_id']."' ");

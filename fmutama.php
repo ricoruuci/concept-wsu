@@ -33,7 +33,9 @@ $namahalaman = "Dashboard";
                                     <h5 class="card-header">Grafik Penjualan Yearly</h5>
                                     <div class="card-body">
                                         <div id="curve_chart"></div> 
+                                        
                                     </div>
+                                    <div id="totals"></div>
                                 </div>
                             </div>
                             
@@ -64,7 +66,7 @@ $namahalaman = "Dashboard";
 
                             $query = sqlsrv_query($conn,"
                             SELECT 
-                            ISNULL(SUM(CASE WHEN X.Overdue <= 0 THEN X.Sisa ELSE 0 END),0) as BlmJth,
+                            ISNULL(SUM(CASE WHEN X.Overdue < 0 THEN X.Sisa ELSE 0 END),0) as BlmJth,
                             ISNULL(SUM(CASE WHEN X.Overdue BETWEEN 1 AND 30 THEN X.Sisa ELSE 0 END),0) as '1sd30',
                             ISNULL(SUM(CASE WHEN X.Overdue BETWEEN 31 AND 90 THEN X.Sisa ELSE 0 END),0) as '31sd90',
                             ISNULL(SUM(CASE WHEN X.Overdue > 90 THEN X.Sisa ELSE 0 END),0) as 'over90',
@@ -286,7 +288,7 @@ $namahalaman = "Dashboard";
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Nama Group</th>
-                                                    <td scope="col" align='right'><b>Stock Dalam Kg</b></td>
+                                                    <td scope="col" align='right'><b>Stock</b></td>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -315,13 +317,13 @@ $namahalaman = "Dashboard";
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
                                 <div class="card">
-                                    <h5 class="card-header">Stock Gudang Finish Good</h5>
+                                    <h5 class="card-header">Stock Gudang</h5>
                                     <div class="card-body">
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Nama Gudang</th>
-                                                    <td scope="col" align='right'><b>Stock Dalam Meter</b></td>
+                                                    <td scope="col" align='right'><b>Stock</b></td>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -329,10 +331,10 @@ $namahalaman = "Dashboard";
                                             
                                             $query8 = sqlsrv_query($conn,"
                                             select x.warehousename, sum(k.stock*k.panjang) as total_meter from (
-                                                select a.itemid, a.warehouseid, b.panjang, isnull(sum(case when a.fgtrans<50 then a.qty else a.qty*-1 end),0) as stock from allitem a 
-                                                inner join inmsitem b on a.itemid=b.itemid where b.fgactive='y' group by a.warehouseid, a.itemid, b.panjang
-                                                ) as k inner join inmswarehouse x on k.warehouseid=x.warehouseid where x.fgraw='t'
-                                                group by x.warehousename");
+                                            select a.itemid, a.warehouseid, b.panjang, isnull(sum(case when a.fgtrans<50 then a.qty else a.qty*-1 end),0) as stock from allitem a 
+                                            inner join inmsitem b on a.itemid=b.itemid group by a.warehouseid, a.itemid, b.panjang
+                                            ) as k inner join inmswarehouse x on k.warehouseid=x.warehouseid where x.fgraw='t'
+                                            group by x.warehousename");
 
                                             while($hasil8 = sqlsrv_fetch_array($query8)){
                                                 echo "<tr>";
@@ -355,92 +357,66 @@ $namahalaman = "Dashboard";
     </div>
     <?php include("script.php"); ?>
 
-    <?php  
+    <?php
+
     $thnini = date('Y');
     $thnlalu = date('Y', strtotime('-1 year'));
-    
-    $query5 = sqlsrv_query($conn,"
-    select * from (
-    select 1 as urut,'Jan' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0101' and '".$thnini."0131' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0101' and '".$thnlalu."0131' ) as data2
-    UNION ALL
-    select 2 as urut,'Feb' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0201' and '".$thnini."0231' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0201' and '".$thnlalu."0231' ) as data2
-    UNION ALL
-    select 3 as urut,'Mar' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0301' and '".$thnini."0331' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0301' and '".$thnlalu."0331' ) as data2
-    UNION ALL
-    select 4 as urut,'Apr' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0401' and '".$thnini."0431' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0401' and '".$thnlalu."0431' ) as data2
-    UNION ALL
-    select 5 as urut,'Mei' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0501' and '".$thnini."0531' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0501' and '".$thnlalu."0531' ) as data2
-    UNION ALL
-    select 6 as urut,'Jun' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0601' and '".$thnini."0631' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0601' and '".$thnlalu."0631' ) as data2
-    UNION ALL
-    select 7 as urut,'Jul' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0701' and '".$thnini."0731' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0701' and '".$thnlalu."0731' ) as data2
-    UNION ALL
-    select 8 as urut,'Agu' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0801' and '".$thnini."0831' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0801' and '".$thnlalu."0831' ) as data2
-    UNION ALL
-    select 9 as urut,'Sep' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."0901' and '".$thnini."0931' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."0901' and '".$thnlalu."0931' ) as data2
-    UNION ALL
-    select 10 as urut,'Okt' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."1001' and '".$thnini."1031' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."1001' and '".$thnlalu."1031' ) as data2
-    UNION ALL
-    select 11 as urut,'Nov' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."1101' and '".$thnini."1131' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."1101' and '".$thnlalu."1131' ) as data2
-    UNION ALL
-    select 12 as urut,'Des' as month,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnini."1201' and '".$thnini."1231' ) as data1,
-    (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$thnlalu."1201' and '".$thnlalu."1231' ) as data2
-    ) as K order by K.urut
+
+    $query5 = sqlsrv_query($conn, "
+        SELECT MONTH(transdate) as month,
+            ISNULL(SUM(CASE WHEN YEAR(transdate) = $thnini THEN ttlkj ELSE 0 END),0) AS data1,
+            ISNULL(SUM(CASE WHEN YEAR(transdate) = $thnlalu THEN ttlkj ELSE 0 END),0) AS data2
+        FROM artrkoninvpelhd
+        WHERE YEAR(transdate) IN ($thnini, $thnlalu)
+        GROUP BY MONTH(transdate)
+        ORDER BY MONTH(transdate)
     ");
     
-    echo '<script>';
-    echo 'var my_2d = [';
-    while($hasil5 = sqlsrv_fetch_array($query5)){
-    echo '{"month":"'.$hasil5[1].'","0":"'.$hasil5[1].'","'.$thnini.'":"'.$hasil5[2].'","1":"'.$hasil5[2].'","'.$thnlalu.'":"'.$hasil5[3].'","2":"'.$hasil5[3].'"},';
-    } 
-    echo ']';
-    echo '</script>';                   
     ?>
+    
     <script type="text/javascript">
 
-        google.charts.load('current', {packages: ['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
+    google.charts.load('current', {packages: ['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        // Data (bulan Januari sampai Desember)
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'Month');
+        data.addColumn('number', '<?php echo $thnini; ?>');
+        data.addColumn('number', '<?php echo $thnlalu; ?>');
+
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var totals = { '<?php echo $thnini; ?>': 0, '<?php echo $thnlalu; ?>': 0 };
+
         
-        function drawChart() {
-
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Month');
-            data.addColumn('number', <?php echo '"'.$thnini.'"'; ?>);
-            data.addColumn('number', <?php echo '"'.$thnlalu.'"'; ?>);
-            for(i = 0; i < my_2d.length; i++)
-            data.addRow([my_2d[i][0], parseInt(my_2d[i][1]),parseInt(my_2d[i][2])]);
-            var options = {
-                curveType: 'function',
-                legend: { position: 'bottom' }
-            };
-
-            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-            chart.draw(data, options);
+        <?php
+        $i = 0;
+        while($hasil5 = sqlsrv_fetch_array($query5)) { 
+        ?>
+            data.addRow([months[<?php echo $i; ?>], <?php echo $hasil5[1]; ?>, <?php echo $hasil5[2]; ?>]);
+            totals["<?php echo $thnini; ?>"] += <?php echo $hasil5[1]; ?>;
+            totals["<?php echo $thnlalu; ?>"] += <?php echo $hasil5[2]; ?>;
+            
+        <?php
+            $i++;
         }
-    </script>
+        ?>
+
+        var options = {
+            curveType: 'function',
+            legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+        chart.draw(data, options);
+
+        // Display total information
+        document.getElementById('totals').innerHTML = 'Total <?php echo $thnini; ?>: ' + totals['<?php echo $thnini; ?>'].toLocaleString() +
+                                                        '<br/> Total <?php echo $thnlalu; ?>: ' + totals['<?php echo $thnlalu; ?>'].toLocaleString();
+    }
+</script>
+
 
     <script>
     window.onload = function () {
@@ -479,10 +455,10 @@ $namahalaman = "Dashboard";
             $query4 = sqlsrv_query($conn,"
             select K.GroupID,L.GroupDesc,SUM(data1) as data1,SUM(data2) as Data2,SUM(data3) as data3 from (
             select 'A' as GroupID,A.salesid,A.SalesName,
-            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$blnini."01' and '".$blnini."31' and X.salesid=A.salesid ) as data1,
-            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$blnlalu."01' and '".$blnlalu."31' and X.salesid=A.salesid ) as data2,
-            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '".$blnlusa."01' and '".$blnlusa."31' and X.salesid=A.salesid ) as data3	
-            from armssales A where fgactive='1'
+            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '20230101' and '20230531' and X.salesid=A.salesid ) as data1,
+            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '20230201' and '20230231' and X.salesid=A.salesid ) as data2,
+            (select isnull(sum(x.ttlkj),0) from artrkoninvpelhd x where convert(varchar(15),transdate,112) between '20230301' and '20230331' and X.salesid=A.salesid ) as data3	
+            from armssales A
             ) as K 
             --left join armsgroupsales L on K.groupID=L.GroupID
             left join (select 'A' as GroupID,'TEST' as GroupDesc) L on K.groupID=L.GroupID
@@ -506,7 +482,7 @@ $namahalaman = "Dashboard";
             echo 'type: "column",';
             echo 'name: "'.$hasil4[1].'",';
             echo 'indexLabel: "{y}",';
-            echo 'yValueFormatString: "#0.##",';
+            echo 'yValueFormatString: "#,##0.00",';
             echo 'showInLegend: true,';
             ?>
             dataPoints: <?php echo json_encode($dataPoints1, JSON_NUMERIC_CHECK); ?>
